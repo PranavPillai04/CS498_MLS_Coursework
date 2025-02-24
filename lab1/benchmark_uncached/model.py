@@ -42,12 +42,12 @@ class CausalSelfAttention(nn.Module):
         B, T, C = x.size() # batch size, sequence length, embedding dimensionality (n_embd)
 
         # calculate query, key, values for all heads in batch.
-        q = torch.einsum('_, _ -> bsnh', x, self.w_q)
-        k = torch.einsum('_, _ -> bsnh', x, self.w_k)
-        v = torch.einsum('_, _ -> bsnh', x, self.w_v)
+        q = torch.einsum('bsd, dnh -> bsnh', x, self.w_q) # b s (n*h), (n*h) n h
+        k = torch.einsum('bsd, dnh -> bsnh', x, self.w_k)
+        v = torch.einsum('bsd, dnh -> bsnh', x, self.w_v)
 
         ## compute attention.
-        att = torch.einsum('_, _ -> bnqk', q, k)
+        att = torch.einsum('_, _ -> bnqk', q, k) # b s n h, b s n h
         att = att / math.sqrt(k.size(-1))
         att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf'))
         ## Compute softmax.

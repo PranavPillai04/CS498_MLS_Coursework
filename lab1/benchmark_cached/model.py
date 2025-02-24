@@ -52,7 +52,7 @@ class CausalSelfAttention(nn.Module):
             k = _
             v = _
 
-        new_kvcache = _
+        new_kvcache = _ ## (k,v) ?
         curr_T = _
 
         if kvcache:
@@ -68,7 +68,7 @@ class CausalSelfAttention(nn.Module):
             # manual implementation of attention
             att = torch.einsum('_, _ -> bnqk', q, k)
             att = att / math.sqrt(k.size(-1))
-            att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf'))
+            att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf')) ## only difference is here
             att = att.to(torch.float32)
             att = F.softmax(att, dim=-1)
             att = att.to(x.dtype)
